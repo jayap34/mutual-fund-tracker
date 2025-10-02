@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mutual Fund Portfolio Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <div class="header__content">
+                    <h1 class="header__title">MF Portfolio Tracker</h1>
+                    <div class="header__actions">
+                        <button id="themeToggle" class="btn btn--outline btn--sm">
+                            <span id="themeIcon">🌙</span>
+                        </button>
+                        <button id="uploadBtn" class="btn btn--primary btn--sm">Upload Excel</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav-tabs">
+            <div class="container">
+                <div class="nav-tabs__list">
+                    <button class="nav-tabs__button nav-tabs__button--active" data-tab="overview">Overview</button>
+                    <button class="nav-tabs__button" data-tab="holdings">Holdings</button>
+                    <button class="nav-tabs__button" data-tab="analytics">Analytics</button>
+                    <button class="nav-tabs__button" data-tab="projections">Projections</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="container">
+                <!-- Overview Tab -->
+                <div id="overview" class="tab-content tab-content--active">
+                    <!-- Portfolio Summary Cards -->
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <div class="summary-card__icon">💰</div>
+                            <div class="summary-card__content">
+                                <h3 class="summary-card__title">Total Investment</h3>
+                                <div class="summary-card__value" id="totalInvestment">₹0</div>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-card__icon">📈</div>
+                            <div class="summary-card__content">
+                                <h3 class="summary-card__title">Current Value</h3>
+                                <div class="summary-card__value" id="currentValue">₹0</div>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-card__icon">💹</div>
+                            <div class="summary-card__content">
+                                <h3 class="summary-card__title">Total Returns</h3>
+                                <div class="summary-card__value" id="totalReturns">₹0</div>
+                                <div class="summary-card__percentage" id="totalReturnsPercent">0%</div>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-card__icon">🎯</div>
+                            <div class="summary-card__content">
+                                <h3 class="summary-card__title">Schemes</h3>
+                                <div class="summary-card__value" id="totalSchemes">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Time Period Filters -->
+                    <div class="time-filters">
+                        <button class="btn btn--outline btn--sm time-filter" data-period="1D">1D</button>
+                        <button class="btn btn--outline btn--sm time-filter" data-period="1W">1W</button>
+                        <button class="btn btn--outline btn--sm time-filter" data-period="1M">1M</button>
+                        <button class="btn btn--outline btn--sm time-filter active" data-period="3M">3M</button>
+                        <button class="btn btn--outline btn--sm time-filter" data-period="6M">6M</button>
+                        <button class="btn btn--outline btn--sm time-filter" data-period="1Y">1Y</button>
+                        <button class="btn btn--outline btn--sm time-filter" data-period="3Y">3Y</button>
+                        <button class="btn btn--outline btn--sm time-filter" data-period="5Y">5Y</button>
+                        <div class="custom-date-range">
+                            <input type="date" id="startDate" class="form-control">
+                            <input type="date" id="endDate" class="form-control">
+                            <button id="customDateBtn" class="btn btn--secondary btn--sm">Apply</button>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="charts-grid">
+                        <div class="chart-container" style="position: relative; height: 400px;">
+                            <canvas id="portfolioTrendChart"></canvas>
+                        </div>
+                        <div class="chart-container" style="position: relative; height: 400px;">
+                            <canvas id="allocationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Holdings Tab -->
+                <div id="holdings" class="tab-content">
+                    <div class="holdings-table">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Scheme Name</th>
+                                    <th>Category</th>
+                                    <th>Units</th>
+                                    <th>Investment</th>
+                                    <th>Current Value</th>
+                                    <th>Returns</th>
+                                    <th>Returns %</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="holdingsTableBody">
+                                <!-- Dynamic content -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Analytics Tab -->
+                <div id="analytics" class="tab-content">
+                    <div class="analytics-grid">
+                        <div class="analytics-card">
+                            <h3>Performance Metrics</h3>
+                            <div class="metrics-list">
+                                <div class="metric">
+                                    <span class="metric-label">CAGR (3Y)</span>
+                                    <span class="metric-value" id="cagr3y">--</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-label">XIRR</span>
+                                    <span class="metric-value" id="xirr">--</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-label">Volatility</span>
+                                    <span class="metric-value" id="volatility">--</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-label">Sharpe Ratio</span>
+                                    <span class="metric-value" id="sharpeRatio">--</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="analytics-card">
+                            <h3>Asset Allocation</h3>
+                            <div class="allocation-breakdown" id="allocationBreakdown">
+                                <!-- Dynamic content -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-container" style="position: relative; height: 400px;">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Projections Tab -->
+                <div id="projections" class="tab-content">
+                    <div class="projections-section">
+                        <div class="projection-inputs">
+                            <div class="form-group">
+                                <label class="form-label">Monthly SIP Amount</label>
+                                <input type="number" id="sipAmount" class="form-control" value="10000" min="500" step="500">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Expected Return Rate (%)</label>
+                                <input type="number" id="expectedReturn" class="form-control" value="12" min="1" max="30" step="0.5">
+                            </div>
+                            <button id="calculateProjections" class="btn btn--primary">Calculate Projections</button>
+                        </div>
+
+                        <div class="projections-cards">
+                            <div class="projection-card">
+                                <h4>1 Year Projection</h4>
+                                <div class="projection-value" id="projection1y">₹0</div>
+                                <div class="projection-gain" id="projectionGain1y">Gain: ₹0</div>
+                            </div>
+                            <div class="projection-card">
+                                <h4>3 Year Projection</h4>
+                                <div class="projection-value" id="projection3y">₹0</div>
+                                <div class="projection-gain" id="projectionGain3y">Gain: ₹0</div>
+                            </div>
+                            <div class="projection-card">
+                                <h4>5 Year Projection</h4>
+                                <div class="projection-value" id="projection5y">₹0</div>
+                                <div class="projection-gain" id="projectionGain5y">Gain: ₹0</div>
+                            </div>
+                        </div>
+
+                        <div class="chart-container" style="position: relative; height: 400px;">
+                            <canvas id="projectionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="uploadModal" class="modal hidden">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h2>Upload Transaction Data</h2>
+                <button id="closeModal" class="modal__close">&times;</button>
+            </div>
+            <div class="modal__body">
+                <div class="upload-area">
+                    <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" class="hidden">
+                    <div class="upload-dropzone" id="dropzone">
+                        <div class="upload-icon">📊</div>
+                        <p>Click to upload or drag and drop your Excel file</p>
+                        <small>Supported formats: .xlsx, .xls, .csv</small>
+                    </div>
+                </div>
+                <div class="sample-format">
+                    <h4>Expected Format:</h4>
+                    <p>Transaction Date, Scheme Name, ISIN, Folio Number, Transaction Type, Price, Units(Credits/Debits), Balance Units, Amount(Credits/Debits), Market Value</p>
+                </div>
+            </div>
+            <div class="modal__footer">
+                <button id="loadSampleData" class="btn btn--secondary">Load Sample Data</button>
+                <button id="processUpload" class="btn btn--primary">Process Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scheme Detail Modal -->
+    <div id="schemeModal" class="modal hidden">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h2 id="schemeModalTitle">Scheme Details</h2>
+                <button id="closeSchemeModal" class="modal__close">&times;</button>
+            </div>
+            <div class="modal__body">
+                <div class="scheme-details" id="schemeDetails">
+                    <!-- Dynamic content -->
+                </div>
+                <div class="chart-container" style="position: relative; height: 300px;">
+                    <canvas id="schemeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
